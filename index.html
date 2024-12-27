@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat App</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="user-info-modal">
+        <div class="modal-content">
+            <h2 class="modal-header">Enter your user information</h2>
+            <form class="user-info-form">
+                <input name="username" type="text" required placeholder="Display Name" />
+                <input name="chatCode" required placeholder="Chat Code" />
+                <button type="submit" class="button join-button">Join</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <h2 class="chat-header">Who's chatting...</h2>
+        <div class="chat-messages" style="height: 300px; overflow-y: auto;"></div>
+
+        <form class="chat-input-form">
+            <input type="text" class="chat-input" required placeholder="Type here..." />
+            <button type="submit" class="button send-button">Send</button>
+        </form>
+
+        <h3>Upload File/Image</h3>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="file" required />
+            <button type="submit">Upload</button>
+        </form>
+
+        <h3>Choose an Emoji</h3>
+        <div>
+            <span class="emoji" onclick="selectEmoji('😀')">😀</span>
+            <span class="emoji" onclick="selectEmoji('😂')">😂</span>
+            <span class="emoji" onclick="selectEmoji('😍')">😍</span>
+            <span class="emoji" onclick="selectEmoji('😎')">😎</span>
+        </div>
+
+        <p id="selectedEmoji"></p>
+        <button class="button clear-chat-button">Clear Chat</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(uploadForm);
+            const sender = document.querySelector('.user-info-form input[name="username"]').value;
+            const chatCode = document.querySelector('.user-info-form input[name="chatCode"]').value;
+
+            formData.append('sender', sender);
+            formData.append('chatCode', chatCode);
+
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+
+            if (result.file) {
+                const timestamp = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                const message = {
+                    sender: sender,
+                    text: `File uploaded: ${result.file}`,
+                    timestamp,
+                    chatCode,
+                };
+                ws.send(JSON.stringify(message));
+            }
+        });
+
+        function selectEmoji(emoji) {
+            const input = document.querySelector('.chat-input');
+            input.value += emoji; // Append emoji to chat input
+            document.getElementById('selectedEmoji').innerText = `You selected: ${emoji}`;
+        }
+    </script>
+</body>
+</html>
