@@ -47,6 +47,23 @@
 
     <script src="app.js"></script>
     <script>
+        // Handle user info form submission
+        document.querySelector('.user-info-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            const username = this.username.value;
+            const chatCode = this.chatCode.value;
+
+            // Handle the logic to join the chat here
+            console.log('Joining chat with username:', username, 'and chat code:', chatCode);
+
+            // For example: Initialize WebSocket here
+            // ws = new WebSocket('ws://your-websocket-url');
+
+            // Close the modal (optional)
+            document.querySelector('.user-info-modal').style.display = 'none';
+        });
+
         const uploadForm = document.getElementById('uploadForm');
 
         uploadForm.addEventListener('submit', async (e) => {
@@ -72,7 +89,7 @@
                     timestamp,
                     chatCode,
                 };
-                ws.send(JSON.stringify(message));
+                ws.send(JSON.stringify(message)); // Ensure ws is properly initialized
             }
         });
 
